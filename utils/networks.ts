@@ -13,7 +13,10 @@ import { bscIcon } from '@/utils/constants';
 // Configure supported networks.
 export const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, arbitrum, { ...bsc, iconUrl: bscIcon }, polygon, goerli],
-  [infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA_API_KEY! }), publicProvider()]
+  [
+    infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA_API_KEY! }),
+    publicProvider()
+  ]
 );
 
 type BaseToken = { symbol: string; name: string; logoURI: string };
@@ -29,7 +32,7 @@ export type NetworkConfig = {
 
 const getRpcUrl = (chainId: number) => {
   const { chains } = provider({ chainId }); // Returns array of all known chains.
-  const chain = chains.find((chain) => chain.id === chainId);
+  const chain = chains.find(chain => chain.id === chainId);
   if (!chain) throw new Error(`Chain with id ${chainId} not found`);
   return chain.rpcUrls.default.http[0];
 };
@@ -44,12 +47,12 @@ export const networks = {
     baseToken: {
       symbol: 'ETH',
       name: 'Ether',
-      logoURI: '',
+      logoURI: ''
     },
     fallbackProviders: {
       chainId: mainnet.id,
-      providers: [{ provider: getRpcUrl(mainnet.id), priority: 1, weight: 1 }],
-    },
+      providers: [{ provider: getRpcUrl(mainnet.id), priority: 1, weight: 1 }]
+    }
   },
   [goerli.id]: {
     blockExplorerUrl: 'https://goerli.etherscan.io/',
@@ -60,12 +63,12 @@ export const networks = {
     baseToken: {
       symbol: 'ETH',
       name: 'Ether',
-      logoURI: '',
+      logoURI: ''
     },
     fallbackProviders: {
       chainId: goerli.id,
-      providers: [{ provider: getRpcUrl(goerli.id), priority: 1, weight: 1 }],
-    },
+      providers: [{ provider: getRpcUrl(goerli.id), priority: 1, weight: 1 }]
+    }
   },
   [bsc.id]: {
     blockExplorerUrl: 'https://bscscan.com/',
@@ -76,12 +79,12 @@ export const networks = {
     baseToken: {
       symbol: 'BNB',
       name: 'Binance coin',
-      logoURI: '',
+      logoURI: ''
     },
     fallbackProviders: {
       chainId: bsc.id,
-      providers: [{ provider: getRpcUrl(bsc.id), priority: 1, weight: 1 }],
-    },
+      providers: [{ provider: getRpcUrl(bsc.id), priority: 1, weight: 1 }]
+    }
   },
   [polygon.id]: {
     blockExplorerUrl: 'https://polygonscan.com/',
@@ -92,12 +95,12 @@ export const networks = {
     baseToken: {
       symbol: 'MATIC',
       name: 'MATIC',
-      logoURI: '',
+      logoURI: ''
     },
     fallbackProviders: {
       chainId: polygon.id,
-      providers: [{ provider: getRpcUrl(polygon.id), priority: 1, weight: 1 }],
-    },
+      providers: [{ provider: getRpcUrl(polygon.id), priority: 1, weight: 1 }]
+    }
   },
   [arbitrum.id]: {
     blockExplorerUrl: 'https://arbiscan.io/',
@@ -107,13 +110,13 @@ export const networks = {
     baseToken: {
       symbol: 'ETH',
       name: 'Ether',
-      logoURI: '',
+      logoURI: ''
     },
     fallbackProviders: {
       chainId: arbitrum.id,
-      providers: [{ provider: getRpcUrl(arbitrum.id), priority: 1, weight: 1 }],
-    },
-  },
+      providers: [{ provider: getRpcUrl(arbitrum.id), priority: 1, weight: 1 }]
+    }
+  }
 } as { [key: number]: NetworkConfig };
 
 export const getEtherscanUrl = (txHashOrAddress: string, chainId: number) => {
@@ -123,7 +126,9 @@ export const getEtherscanUrl = (txHashOrAddress: string, chainId: number) => {
       : 'tx'
     : 'ens';
   const chain = getNetwork(chainId);
-  const networkPrefix = chain?.blockExplorerUrl ? chain?.blockExplorerUrl : 'https://etherscan.io';
+  const networkPrefix = chain?.blockExplorerUrl
+    ? chain?.blockExplorerUrl
+    : 'https://etherscan.io';
   if (group === 'ens') {
     return `${networkPrefix}`;
   } else {
@@ -139,7 +144,7 @@ export const buildBaseToken = (baseToken: BaseToken, chainId: number) => {
     decimals: 18,
     name: baseToken.name,
     logoURI: baseToken.logoURI,
-    balance: BigNumber.from(0),
+    balance: BigNumber.from(0)
   };
 };
 

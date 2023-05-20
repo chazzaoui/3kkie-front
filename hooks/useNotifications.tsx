@@ -6,7 +6,7 @@ import { getEtherscanUrl } from '@/utils/networks';
 
 const toastDefaultArgs = {
   position: 'bottom-right' as ToastPosition,
-  isClosable: true,
+  isClosable: true
 };
 
 const useNotifications = () => {
@@ -17,7 +17,7 @@ const useNotifications = () => {
     title,
     alertType,
     message,
-    id,
+    id
   }: {
     alertType: AlertStatus;
     message: string;
@@ -32,7 +32,7 @@ const useNotifications = () => {
       id,
       description: message,
       title,
-      status: alertType,
+      status: alertType
     });
   };
 
@@ -50,7 +50,7 @@ const useNotifications = () => {
       ),
 
       duration: null,
-      status: 'loading',
+      status: 'loading'
     });
 
     const { status } = await provider.waitForTransaction(txHash);
@@ -65,13 +65,13 @@ const useNotifications = () => {
           Transaction failed
         </Link>
       ),
-      status: status ? 'success' : 'error',
+      status: status ? 'success' : 'error'
     });
   };
 
   return {
     notifyUser,
-    txNotify,
+    txNotify
   };
 };
 

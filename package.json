@@ -13,21 +13,33 @@
     "@chakra-ui/react": "^2.6.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@rainbow-me/rainbowkit": "^1.0.0",
+    "@railgun-community/quickstart": "^4.4.3",
+    "@railgun-community/shared-models": "^4.2.2",
+    "@rainbow-me/rainbowkit": "^0.8.1",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/level-js": "^4.0.2",
+    "browser-level": "^1.0.1",
+    "ethers": "^5.6.0",
     "framer-motion": "^10.12.12",
+    "fuse.js": "^6.6.2",
+    "level-js": "^6.1.0",
+    "levelup": "^5.1.1",
+    "localforage": "^1.10.0",
     "next": "^12.2.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
     "react-qr-code": "^2.0.11",
     "react-web-share": "^2.0.2",
+    "swr": "^2.1.5",
     "viem": "~0.3.19",
-    "wagmi": "^1.0.1"
+    "wagmi": "^0.9.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.35",
     "@types/react": "^18.0.9",
     "eslint": "^8.15.0",
-    "eslint-config-next": "^12.2.6",
+    "eslint-config-next": "^13.4.3",
     "typescript": "^5.0.4"
   }
 }

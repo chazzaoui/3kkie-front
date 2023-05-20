@@ -7,7 +7,7 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalHeader,
-  ModalOverlay,
+  ModalOverlay
 } from '@chakra-ui/modal';
 import { Alert, AlertIcon } from '@chakra-ui/react';
 import { Tooltip } from '@chakra-ui/tooltip';
@@ -26,7 +26,7 @@ type ReviewTransactionModalProps = {
   recipient: string;
   displayName: string;
   token: TokenListContextItem;
-  amount: string;
+  amount?: string;
   onSubmitClick: () => void;
 };
 
@@ -37,7 +37,7 @@ const ReviewTransactionModal = ({
   amount,
   displayName,
   token,
-  onSubmitClick,
+  onSubmitClick
 }: ReviewTransactionModalProps) => {
   const { shieldingFees } = useToken();
   const { txNotify } = useNotifications();
@@ -48,20 +48,22 @@ const ReviewTransactionModal = ({
   const tokenDecimals = token?.decimals;
 
   const bigNumberAmount = parseUnits(tokenAmount! || '0', tokenDecimals);
-  const shieldFee = shieldingFees[chain?.id || 1] || shieldingFees[1];
-  const feeAmount = parseUnits(tokenAmount! || '0', tokenDecimals)
+  const shieldFee = shieldingFees[chain?.id || 1] || shieldingFees[1] || 0;
+  console.log({ shieldFee });
+  const feeAmount = parseUnits(tokenAmount || '0', tokenDecimals)
     .mul(shieldFee)
     .div(10000);
 
   const doSubmit: React.FormEventHandler = async () => {
-    if (!token.address || !amount || !token?.decimals || !recipient) throw new Error('bad form');
+    if (!token.address || !amount || !token?.decimals || !recipient)
+      throw new Error('bad form');
     try {
       setError(undefined);
       const tx = await shield({
         tokenAddress: token.address,
         tokenAmount: amount,
         tokenDecimals: token?.decimals,
-        recipient,
+        recipient
       });
       txNotify(tx.hash);
       onClose();
@@ -86,57 +88,66 @@ const ReviewTransactionModal = ({
         <ModalHeader>Confirm Shield</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Flex direction="column">
-            <Flex direction="column" borderRadius="1.5rem" border="1px solid black" padding="1rem">
-              <Flex align="center" justify="space-between">
-                <Heading size="xs" paddingX={2}>
+          <Flex direction='column'>
+            <Flex
+              direction='column'
+              borderRadius='1.5rem'
+              border='1px solid black'
+              padding='1rem'
+            >
+              <Flex align='center' justify='space-between'>
+                <Heading size='xs' paddingX={2}>
                   Recipient
                 </Heading>
                 <Tooltip label={recipient}>
-                  <Text size="sm" textOverflow="ellipsis">
-                    {displayName === recipient ? shortenAddress(displayName) : displayName}
+                  <Text size='sm' textOverflow='ellipsis'>
+                    {displayName === recipient
+                      ? shortenAddress(displayName)
+                      : displayName}
                   </Text>
                 </Tooltip>
               </Flex>
-              <Flex align="center" justify="space-between">
-                <Heading size="xs" paddingX={2}>
+              <Flex align='center' justify='space-between'>
+                <Heading size='xs' paddingX={2}>
                   Token name
                 </Heading>
-                <Text size="sm">{token?.name}</Text>
+                <Text size='sm'>{token?.name}</Text>
               </Flex>
-              <Flex align="center" justify="space-between">
-                <Heading size="xs" paddingX={2}>
+              <Flex align='center' justify='space-between'>
+                <Heading size='xs' paddingX={2}>
                   Amount
                 </Heading>
-                <Text size="sm">
-                  {ethers.utils.formatUnits(bigNumberAmount, token?.decimals)} {token?.symbol}
+                <Text size='sm'>
+                  {ethers.utils.formatUnits(bigNumberAmount, token?.decimals)}{' '}
+                  {token?.symbol}
                 </Text>
               </Flex>
-              <Flex align="center" justify="space-between">
-                <Heading size="xs" paddingX={2}>
+              <Flex align='center' justify='space-between'>
+                <Heading size='xs' paddingX={2}>
                   Shielding fee
                 </Heading>
-                <Text size="sm">
-                  {ethers.utils.formatUnits(feeAmount, token?.decimals)} {token?.symbol}
+                <Text size='sm'>
+                  {ethers.utils.formatUnits(feeAmount, token?.decimals)}{' '}
+                  {token?.symbol}
                 </Text>
               </Flex>
             </Flex>
           </Flex>
           {!shieldPrivateKey && (
-            <Alert status="info" mt=".5rem" borderRadius="md">
+            <Alert status='info' mt='.5rem' borderRadius='md'>
               <AlertIcon />
               <div>
                 You will first be prompted to sign the message{' '}
-                <Code>{getShieldPrivateKeySignatureMessage()}</Code>, enabling you to decrypt the
-                receiving address in the future.
+                <Code>{getShieldPrivateKeySignatureMessage()}</Code>, enabling
+                you to decrypt the receiving address in the future.
               </div>
             </Alert>
           )}
           {error && (
             <Alert
-              status="error"
-              mt=".5rem"
-              borderRadius="md"
+              status='error'
+              mt='.5rem'
+              borderRadius='md'
               wordBreak={'break-word'}
               maxH={'3xs'}
               overflowY={'auto'}
@@ -150,9 +161,9 @@ const ReviewTransactionModal = ({
             isDisabled={isShielding}
             isLoading={isShielding}
             onClick={doSubmit}
-            w="100%"
-            mt=".5rem"
-            mb="1rem"
+            w='100%'
+            mt='.5rem'
+            mb='1rem'
           >
             Shield
           </Button>

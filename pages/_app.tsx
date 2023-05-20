@@ -2,12 +2,16 @@ import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+import { WagmiConfig, createClient, configureChains } from 'wagmi';
 import { arbitrum, goerli, mainnet, optimism, polygon } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react';
+import { provider, webSocketProvider } from '@/utils/networks';
+import { useMemo } from 'react';
+import { initialize } from '@/utils/railgun';
+import { useRailgunProvider } from '@/hooks/useRailgunProvider';
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
+const { chains } = configureChains(
   [
     mainnet,
     polygon,
@@ -20,21 +24,22 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: 'RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID',
   chains
 });
 
-const wagmiConfig = createConfig({
+const wagmiClient = createClient({
   autoConnect: true,
   connectors,
-  publicClient,
-  webSocketPublicClient
+  provider,
+  webSocketProvider
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useMemo(initialize, []);
+  const { isProviderLoaded, shieldingFees } = useRailgunProvider();
   return (
     <ChakraProvider>
-      <WagmiConfig config={wagmiConfig}>
+      <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
           <Component {...pageProps} />
         </RainbowKitProvider>
