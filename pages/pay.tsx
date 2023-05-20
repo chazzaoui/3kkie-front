@@ -6,11 +6,13 @@ import { useRouter } from 'next/router';
 
 const Pay3kkie: React.FC = () => {
   const router = useRouter();
-  const { receiver, amount } = router.query;
+  const { receiver, amount, token } = router.query;
   return (
     <>
       <div>{receiver}</div>
-      <div>{amount}</div>
+      <div>
+        {amount} {token}
+      </div>
     </>
   );
 };
