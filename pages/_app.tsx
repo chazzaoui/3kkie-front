@@ -42,11 +42,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ChakraProvider>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
-          {isProviderLoaded && (
+          {isProviderLoaded ? (
             <TokenListProvider shieldingFees={shieldingFees}>
               <Component {...pageProps} />
             </TokenListProvider>
-          )}
+          ) : null}
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>

@@ -20,7 +20,6 @@ export const useTokenList = () => {
   const { chain } = useNetwork();
   const chainId = chain?.id || 1; // default to mainnet if no chain id
   const network = getNetwork(chainId);
-  console.log(tokenListJson.tokens, 'tokens?');
   const tokenList = tokenListJson.tokens
     .filter(token => token.chainId === chainId)
     .sort((a, b) => {

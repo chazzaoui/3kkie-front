@@ -14,6 +14,7 @@ const Pay3kkie: React.FC = () => {
       </Flex>
       <Box paddingTop={20}>
         <TxForm
+          token={token as string}
           amount={amount as string}
           recipientAddress={receiver as string}
         />

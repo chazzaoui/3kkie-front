@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { parseUnits } from '@ethersproject/units';
-import { populateShield, populateShieldBaseToken } from '@railgun-community/quickstart';
+import {
+  populateShield,
+  populateShieldBaseToken
+} from '@railgun-community/quickstart';
 import {
   NETWORK_CONFIG,
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
-  deserializeTransaction,
+  deserializeTransaction
 } from '@railgun-community/shared-models';
 import { ethers } from 'ethers';
 import { useAccount, useSigner } from 'wagmi';
@@ -32,7 +35,9 @@ const useRailgunTx = () => {
     setIsShielding(true);
     try {
       const resp =
-        args.tokenAddress === ethAddress ? await shieldBaseToken(args) : await shieldToken(args);
+        args.tokenAddress === ethAddress
+          ? await shieldBaseToken(args)
+          : await shieldToken(args);
       setIsShielding(false);
       return resp;
     } catch (e) {
@@ -44,7 +49,7 @@ const useRailgunTx = () => {
   const shieldBaseToken = async ({
     tokenAmount,
     tokenDecimals,
-    recipient,
+    recipient
   }: {
     tokenAddress: string;
     tokenAmount: string;
@@ -57,7 +62,7 @@ const useRailgunTx = () => {
 
     const wrappedERC20Amount: RailgunERC20Amount = {
       tokenAddress: wethAddress, // wETH
-      amountString: parseUnits(tokenAmount!, tokenDecimals).toHexString(), // hexadecimal amount
+      amountString: parseUnits(tokenAmount!, tokenDecimals).toHexString() // hexadecimal amount
     };
 
     const { serializedTransaction, error } = await populateShieldBaseToken(
@@ -72,11 +77,12 @@ const useRailgunTx = () => {
 
     const { chain } = NETWORK_CONFIG[network];
 
-    const transactionRequest: ethers.providers.TransactionRequest = deserializeTransaction(
-      serializedTransaction!,
-      undefined, // nonce (optional)
-      chain.id
-    );
+    const transactionRequest: ethers.providers.TransactionRequest =
+      deserializeTransaction(
+        serializedTransaction!,
+        undefined, // nonce (optional)
+        chain.id
+      );
 
     // Public wallet to shield from.
     transactionRequest.from = address;
@@ -88,7 +94,7 @@ const useRailgunTx = () => {
     tokenAddress,
     tokenAmount,
     recipient,
-    tokenDecimals,
+    tokenDecimals
   }: {
     tokenAddress: string;
     tokenAmount: string;
@@ -103,9 +109,11 @@ const useRailgunTx = () => {
     const erc20AmountRecipients: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: tokenAddress!,
-        amountString: ethers.utils.parseUnits(tokenAmount, tokenDecimals).toHexString(), // must be hex
-        recipientAddress: recipient!, // RAILGUN address
-      },
+        amountString: ethers.utils
+          .parseUnits(tokenAmount, tokenDecimals)
+          .toHexString(), // must be hex
+        recipientAddress: recipient! // RAILGUN address
+      }
     ];
 
     const { serializedTransaction, error } = await populateShield(
@@ -120,11 +128,12 @@ const useRailgunTx = () => {
 
     const { chain } = NETWORK_CONFIG[network];
 
-    const transactionRequest: ethers.providers.TransactionRequest = deserializeTransaction(
-      serializedTransaction as string,
-      undefined, // nonce (optional)
-      chain.id
-    );
+    const transactionRequest: ethers.providers.TransactionRequest =
+      deserializeTransaction(
+        serializedTransaction as string,
+        undefined, // nonce (optional)
+        chain.id
+      );
 
     // Public wallet to shield from.
     transactionRequest.from = address;

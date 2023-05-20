@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { CopyIcon } from '@chakra-ui/icons';
 import { RWebShare } from 'react-web-share';
 import { useAccount } from 'wagmi';
 import QRCode from 'react-qr-code';
+import { entropyToMnemonic, randomBytes } from 'ethers/lib/utils';
+import {
+  createRailgunWallet,
+  loadWalletByID
+} from '@railgun-community/quickstart';
+
+const mnemonic = entropyToMnemonic(randomBytes(16));
 import {
   Container,
   Flex,
@@ -22,18 +29,60 @@ import {
   useClipboard,
   useToast
 } from '@chakra-ui/react';
+import { generateEncryptionKey } from '@/utils/generateKey';
+import { NetworkName } from '@railgun-community/shared-models';
+import TokenInput from '@/components/TokenInput';
+import { TokenListContextItem, useToken } from '@/contexts/TokenContext';
 
 const Home: React.FC = () => {
   const { address } = useAccount();
-  const [selectedToken, setSelectedToken] = useState('');
   const [amount, setAmount] = useState('');
+  const { tokenList } = useToken();
+
   const [showQRCode, setShowQRCode] = useState(false);
-  const url = `http://localhost:3000/pay?receiver=${address}&amount=${amount}&token=${selectedToken}`;
+  const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
+    tokenList[0]
+  );
+  const [url, setUrl] = useState('');
+
+  const [railgunWallet, setRailgunWallet] = useState<string | undefined>('');
   const toast = useToast();
+  const railgunId = localStorage.getItem('railgunId');
   const { hasCopied, onCopy } = useClipboard(url);
 
-  const handleTokenChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedToken(event.target.value);
+  useEffect(() => {
+    const loadRailgunWallet = async () => {
+      const encryptionKey = generateEncryptionKey(address);
+
+      if (railgunId) {
+        const railgunWallet = await loadWalletByID(
+          encryptionKey,
+          railgunId,
+          false
+        );
+        setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
+      }
+    };
+
+    loadRailgunWallet();
+  }, []);
+  console.log({ selectedToken });
+  const handleWalletCreation = async () => {
+    const encryptionKey = generateEncryptionKey(address);
+
+    const creationBlockNumberMap = {
+      [NetworkName.Ethereum]: 15725700,
+      [NetworkName.Polygon]: 3421400
+    };
+    if (!railgunId) {
+      const railgunWallet = await createRailgunWallet(
+        encryptionKey,
+        mnemonic,
+        creationBlockNumberMap
+      );
+      localStorage.setItem('railgunId', railgunId as string);
+      setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
+    }
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +90,10 @@ const Home: React.FC = () => {
   };
 
   const handleRequest = () => {
+    setUrl(
+      `http://localhost:3000/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
+    );
+    handleWalletCreation();
     setShowQRCode(!showQRCode);
   };
 
@@ -54,7 +107,7 @@ const Home: React.FC = () => {
     });
   };
 
-  if (!showQRCode) {
+  if (showQRCode) {
     return (
       <Container style={{ height: '100%' }}>
         <Flex as='header' position='fixed' backgroundColor='white' w='100%'>
@@ -157,18 +210,21 @@ const Home: React.FC = () => {
             border: '1px solid black'
           }}
         >
-          <Select
-            aria-label='Amount'
-            mt={4}
-            mb={4}
-            placeholder='Select token'
+          <TokenInput
             value={selectedToken}
-            onChange={handleTokenChange}
-          >
-            <option value='ETH'>ETH</option>
-            <option value='MATIC'>MATIC</option>
-            <option value='BTC'>BTC</option>
-          </Select>
+            onSelect={token => {
+              setSelectedToken(token);
+            }}
+            onBlur={async function (event: {
+              target: any;
+              type?: any;
+            }): Promise<boolean | void> {}}
+            onChange={async function (event: {
+              target: any;
+              type?: any;
+            }): Promise<boolean | void> {}}
+            name={''}
+          />
           <NumberInput mb={12}>
             <NumberInputField
               placeholder='0.00'

@@ -43,10 +43,12 @@ type TxFormValues = {
 
 export const TxForm = ({
   recipientAddress,
-  amount
+  amount,
+  token
 }: {
   recipientAddress?: string;
   amount?: string;
+  token?: string;
 }) => {
   const { tokenAllowances, tokenList } = useToken();
   const { mutate } = useSWRConfig();
@@ -63,7 +65,6 @@ export const TxForm = ({
   } = useForm<TxFormValues>({
     mode: 'onChange',
     defaultValues: {
-      token: network.baseToken.name,
       recipient: recipientAddress,
       amount: amount
     }
@@ -73,9 +74,14 @@ export const TxForm = ({
     onOpen: openReview,
     onClose: closeReview
   } = useDisclosure();
-  const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
-    tokenList[0]
-  );
+
+  const tokenWithChainId = tokenList.find(
+    toke => toke.symbol === token
+  ) as TokenListContextItem;
+
+  const [selectedToken, setSelectedToken] =
+    useState<TokenListContextItem>(tokenWithChainId);
+
   const [validAddress, setValidAddress] = useState(false);
   // const { config } = usePrepareContractWrite({
   //   address: selectedToken?.address as `0x${string}`,
@@ -136,12 +142,6 @@ export const TxForm = ({
     const unwatch = watchNetwork(updateOnNetworkChange);
     return unwatch;
   }, [updateOnNetworkChange]);
-
-  useEffect(() => {
-    if (!selectedToken) {
-      setSelectedToken(tokenList[0]);
-    }
-  }, [selectedToken, tokenList]);
 
   return (
     <Box maxWidth='24rem' className='container'>
@@ -204,12 +204,14 @@ export const TxForm = ({
         </FormControl>
         <FormControl isInvalid={Boolean(errors.token?.message)} mt='.5rem'>
           <FormLabel>Token</FormLabel>
-          <TokenInput
-            {...register('token')}
-            onSelect={token => {
-              setValue('token', token.name);
-              setSelectedToken(token);
-            }}
+          <Input
+            variant='outline'
+            size='lg'
+            pr='4.5rem'
+            height='100%'
+            padding={4}
+            placeholder={selectedToken?.name}
+            disabled={true}
           />
         </FormControl>
         <FormControl isInvalid={Boolean(errors.amount?.message)}>

@@ -1,23 +1,30 @@
 import {
   ArtifactStore,
+  BalancesUpdatedCallback,
   loadProvider,
   setLoggers,
-  startRailgunEngine,
+  startRailgunEngine
 } from '@railgun-community/quickstart';
 import { BrowserLevel } from 'browser-level';
 import localforage from 'localforage';
 import { getNetwork, networks } from './networks';
+import { setOnBalanceUpdateCallback } from '@railgun-community/quickstart';
+import { Chain, NFTTokenType } from '@railgun-community/shared-models';
 
 export const loadProviders = async () => {
   // Whether to forward debug logs from Fallback Provider.
   const shouldDebug = true;
   return Promise.all(
-    Object.keys(networks).map(async (chainIdString) => {
+    Object.keys(networks).map(async chainIdString => {
       const chainId = Number(chainIdString);
       const { railgunNetworkName, fallbackProviders } = getNetwork(chainId);
       return {
         chainId,
-        providerInfo: await loadProvider(fallbackProviders, railgunNetworkName, shouldDebug),
+        providerInfo: await loadProvider(
+          fallbackProviders,
+          railgunNetworkName,
+          shouldDebug
+        )
       };
     })
   );
@@ -59,7 +66,7 @@ export const initialize = () => {
   // Whether to forward Engine debug logs to Logger.
   const shouldDebug = true;
 
-  const skipMerkleTreeScans = true;
+  const skipMerkleTreeScans = false;
 
   startRailgunEngine(
     walletSource,
@@ -71,4 +78,16 @@ export const initialize = () => {
     skipMerkleTreeScans
   );
   setLogging();
+
+  const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
+    chain,
+    railgunWalletID,
+    erc20Amounts,
+    nftAmounts
+  }): void => {
+    console.log(erc20Amounts);
+    console.log(nftAmounts);
+  };
+
+  setOnBalanceUpdateCallback(onBalanceUpdateCallback);
 };

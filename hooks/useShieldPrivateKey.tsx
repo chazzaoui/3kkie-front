@@ -16,7 +16,9 @@ const useShieldPrivateKey = () => {
   const getShieldPrivateKey = async () => {
     if (shieldPrivateKey) return shieldPrivateKey;
     const spk = keccak256(
-      await (signer as Signer).signMessage(getShieldPrivateKeySignatureMessage())
+      await (signer as Signer).signMessage(
+        getShieldPrivateKeySignatureMessage()
+      )
     );
     setShieldPrivateKey(spk);
     return spk;

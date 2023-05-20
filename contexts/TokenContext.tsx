@@ -60,7 +60,7 @@ export const TokenListProvider = ({
       message: 'Something went wrong fetching the token allowances'
     });
   }
-  console.log({ data });
+
   return (
     <TokenContext.Provider
       value={{
