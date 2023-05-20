@@ -82,7 +82,6 @@ const Home: React.FC = () => {
             </Flex>
             <Flex alignItems='center' mb={4}>
               <Text
-                flex='1'
                 overflow='hidden'
                 textOverflow='ellipsis'
                 whiteSpace='nowrap'

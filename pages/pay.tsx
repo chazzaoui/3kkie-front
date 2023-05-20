@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { RWebShare } from 'react-web-share';
-import { useAccount } from 'wagmi';
-import QRCode from 'react-qr-code';
 import { useRouter } from 'next/router';
 
 const Pay3kkie: React.FC = () => {
