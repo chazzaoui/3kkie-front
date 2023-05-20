@@ -9,10 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@railgun-community/quickstart": "^4.4.3",
+    "@railgun-community/shared-models": "^4.2.2",
     "@rainbow-me/rainbowkit": "^1.0.0",
+    "level-js": "^6.1.0",
     "next": "^12.2.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "readline": "^1.3.0",
+    "snarkjs": "^0.6.11",
     "viem": "~0.3.19",
     "wagmi": "^1.0.1"
   },
