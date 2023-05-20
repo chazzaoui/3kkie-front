@@ -64,7 +64,8 @@ export const TxForm = ({
     mode: 'onChange',
     defaultValues: {
       token: network.baseToken.name,
-      recipient: recipientAddress
+      recipient: recipientAddress,
+      amount: amount
     }
   });
   const {
@@ -75,7 +76,6 @@ export const TxForm = ({
   const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
     tokenList[0]
   );
-  console.log({ amount });
   const [validAddress, setValidAddress] = useState(false);
   // const { config } = usePrepareContractWrite({
   //   address: selectedToken?.address as `0x${string}`,

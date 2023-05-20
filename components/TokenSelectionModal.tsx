@@ -10,7 +10,7 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalHeader,
-  ModalOverlay,
+  ModalOverlay
 } from '@chakra-ui/modal';
 import { useDisclosure } from '@chakra-ui/react';
 import { Spinner } from '@chakra-ui/spinner';
@@ -19,14 +19,23 @@ import { BigNumber, FixedNumber, ethers } from 'ethers';
 import { formatUnits, isAddress } from 'ethers/lib/utils.js';
 import Fuse from 'fuse.js';
 import localforage from 'localforage';
-import { useAccount, useBalance, useNetwork, useToken as useWagmiToken } from 'wagmi';
+import {
+  useAccount,
+  useBalance,
+  useNetwork,
+  useToken as useWagmiToken
+} from 'wagmi';
 import WarningModal from '@/components/WarningModal';
 import { useToken } from '@/contexts/TokenContext';
 import { TokenListContextItem } from '@/contexts/TokenContext';
 import useLocalForageSet from '@/hooks/useLocalForageSet';
 import useNotifications from '@/hooks/useNotifications';
 import { TokenListItem } from '@/hooks/useTokenList';
-import { CUSTOM_TOKENS_STORAGE_KEY, ipfsDomain, rebaseTokens } from '@/utils/constants';
+import {
+  CUSTOM_TOKENS_STORAGE_KEY,
+  ipfsDomain,
+  rebaseTokens
+} from '@/utils/constants';
 import { parseIPFSUri } from '@/utils/ipfs';
 import { getNetwork } from '@/utils/networks';
 
@@ -48,21 +57,25 @@ type CustomTokenSelectionItemProps = {
   tokenAddress: Address;
 };
 
-const TokenSelectionItem = ({ token, onClick, isBalanceLoading }: TokenSelectionItemProps) => {
+const TokenSelectionItem = ({
+  token,
+  onClick,
+  isBalanceLoading
+}: TokenSelectionItemProps) => {
   const tokenBalance = token?.balance || BigNumber.from(0);
   return (
     <Flex
-      justify="space-between"
-      paddingY=".35rem"
+      justify='space-between'
+      paddingY='.35rem'
       _hover={{ backgroundColor: 'rgba(184, 192, 220, 0.08)' }}
-      borderRadius=".5rem"
-      padding=".5rem"
-      cursor="pointer"
+      borderRadius='.5rem'
+      padding='.5rem'
+      cursor='pointer'
       onClick={() => onClick(token)}
     >
-      <Flex direction="column" justify="center" w="2rem">
+      <Flex direction='column' justify='center' w='2rem'>
         <Image
-          boxSize="1.55rem"
+          boxSize='1.55rem'
           src={
             token.logoURI.slice(0, 4) == 'ipfs'
               ? `${ipfsDomain}${parseIPFSUri(token.logoURI)}`
@@ -70,23 +83,26 @@ const TokenSelectionItem = ({ token, onClick, isBalanceLoading }: TokenSelection
           }
           alt={`${token.name}'s token logo`}
           fallback={
-            <Circle size="1.55rem" bg="lightgrey">
-              <Text fontSize=".5rem">{token.symbol.slice(0, 3)}</Text>
+            <Circle size='1.55rem' bg='lightgrey'>
+              <Text fontSize='.5rem'>{token.symbol.slice(0, 3)}</Text>
             </Circle>
           }
         />
       </Flex>
-      <Flex direction="column" w="100%" paddingLeft="1.5rem">
-        <Text fontSize="md">{token.name}</Text>
-        <Text fontSize="xs">{token.symbol}</Text>
+      <Flex direction='column' w='100%' paddingLeft='1.5rem'>
+        <Text fontSize='md'>{token.name}</Text>
+        <Text fontSize='xs'>{token.symbol}</Text>
       </Flex>
-      <Flex direction="column" justify="center">
+      <Flex direction='column' justify='center'>
         {isBalanceLoading ? (
           <Spinner />
         ) : (
-          <Text size="md">
+          <Text size='md'>
             {FixedNumber.from(
-              formatUnits(tokenBalance.toString() || '0', token?.decimals || 0).toString()
+              formatUnits(
+                tokenBalance.toString() || '0',
+                token?.decimals || 0
+              ).toString()
             )
               .round(4)
               .toString() || 0}
@@ -100,27 +116,34 @@ const TokenSelectionItem = ({ token, onClick, isBalanceLoading }: TokenSelection
 const EmptyTokenItem = () => {
   return (
     <Flex
-      justify="center"
-      align="center"
-      w="100%"
-      paddingY=".35rem"
+      justify='center'
+      align='center'
+      w='100%'
+      paddingY='.35rem'
       _hover={{ backgroundColor: 'rgba(184, 192, 220, 0.08)' }}
-      borderRadius=".5rem"
-      padding=".5rem"
+      borderRadius='.5rem'
+      padding='.5rem'
     >
-      <Text fontSize="md">No results</Text>
+      <Text fontSize='md'>No results</Text>
     </Flex>
   );
 };
 
-const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelectionItemProps) => {
+const CustomTokenSelectionItem = ({
+  onSelect,
+  tokenAddress
+}: CustomTokenSelectionItemProps) => {
   const { notifyUser } = useNotifications();
   const { chain } = useNetwork();
-  const { isOpen: isCustomOpen, onOpen: onCustomOpen, onClose: onCustomClose } = useDisclosure();
+  const {
+    isOpen: isCustomOpen,
+    onOpen: onCustomOpen,
+    onClose: onCustomClose
+  } = useDisclosure();
   const {
     isOpen: isBlacklistOpen,
     onOpen: onBlacklistOpen,
-    onClose: onBlacklistClose,
+    onClose: onBlacklistClose
   } = useDisclosure();
   const network = getNetwork(chain?.id);
   const tokenLink = `${network.blockExplorerUrl}token/${tokenAddress}`;
@@ -129,15 +152,15 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
   const {
     data: balanceData,
     isError: isBalanceError,
-    isLoading: isBalanceLoading,
+    isLoading: isBalanceLoading
   } = useBalance({
     address,
     token: tokenAddress,
-    chainId: chain?.id,
+    chainId: chain?.id
   });
   const { setItem } = useLocalForageSet();
   const isBlacklisted = rebaseTokens.find(
-    (address) => tokenAddress.toLowerCase() === address.toLowerCase()
+    address => tokenAddress.toLowerCase() === address.toLowerCase()
   );
   const openModal = isBlacklisted ? onBlacklistOpen : onCustomOpen;
 
@@ -145,7 +168,7 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
     notifyUser({
       id: 'custom-token-warning',
       alertType: 'error',
-      message: 'Failed to fetch custom token',
+      message: 'Failed to fetch custom token'
     });
   }
 
@@ -153,7 +176,7 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
     notifyUser({
       id: 'custom-token-error',
       alertType: 'error',
-      message: 'Failed to fetch custom token balance',
+      message: 'Failed to fetch custom token balance'
     });
   }
 
@@ -162,20 +185,31 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
   }
 
   if (data) {
-    const token = { ...data, logoURI: '', chainId: chain!.id, balance: balanceData?.value || null };
+    const token = {
+      ...data,
+      logoURI: '',
+      chainId: chain!.id,
+      balance: balanceData?.value || null
+    };
     return (
       <>
-        <TokenSelectionItem token={token} onClick={openModal} isBalanceLoading={isBalanceLoading} />
+        <TokenSelectionItem
+          token={token}
+          onClick={openModal}
+          isBalanceLoading={isBalanceLoading}
+        />
         <WarningModal
           isOpen={isCustomOpen}
           onClose={onCustomClose}
           onClick={async () => {
             const customTokens =
-              (await localforage.getItem<TokenListItem[]>(CUSTOM_TOKENS_STORAGE_KEY)) || [];
+              (await localforage.getItem<TokenListItem[]>(
+                CUSTOM_TOKENS_STORAGE_KEY
+              )) || [];
             await setItem<TokenListItem[]>({
               key: `localForageGet-${CUSTOM_TOKENS_STORAGE_KEY}`,
               path: CUSTOM_TOKENS_STORAGE_KEY,
-              value: [...customTokens, token],
+              value: [...customTokens, token]
             });
             onSelect(token);
             onCustomClose();
@@ -183,22 +217,27 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
           address={tokenAddress}
           description={`This token isn't included in the railgun token list. Always conduct your own research before shielding.`}
         >
-          <Flex my=".75rem" justify="center">
+          <Flex my='.75rem' justify='center'>
             <Flex
-              alignItems="center"
-              gap=".30rem"
-              padding=".50rem"
-              bg="gray.100"
-              borderRadius="1rem"
+              alignItems='center'
+              gap='.30rem'
+              padding='.50rem'
+              bg='gray.100'
+              borderRadius='1rem'
               _hover={{ backgroundColor: 'rgba(184, 192, 220, 0.15)' }}
             >
-              <Link href={tokenLink} _hover={{ textDecoration: 'none' }} isExternal maxW="18rem">
+              <Link
+                href={tokenLink}
+                _hover={{ textDecoration: 'none' }}
+                isExternal
+                maxW='18rem'
+              >
                 <Text
-                  cursor="pointer"
-                  maxW="20rem"
-                  textOverflow="ellipsis"
-                  overflow="hidden"
-                  whiteSpace="nowrap"
+                  cursor='pointer'
+                  maxW='20rem'
+                  textOverflow='ellipsis'
+                  overflow='hidden'
+                  whiteSpace='nowrap'
                 >
                   {tokenLink}
                 </Text>
@@ -216,7 +255,9 @@ const CustomTokenSelectionItem = ({ onSelect, tokenAddress }: CustomTokenSelecti
             onBlacklistClose();
           }}
           address={tokenAddress}
-          description={'This token cannot be shielded because it is a rebase token'}
+          description={
+            'This token cannot be shielded because it is a rebase token'
+          }
         />
       </>
     );
@@ -230,7 +271,7 @@ const TokenSelectionModal = (props: TokenSelectionModalProps) => {
   const options = {
     includeScore: true,
     keys: ['address', 'name', 'symbol'],
-    threshold: 0.2,
+    threshold: 0.2
   };
 
   const fuse = new Fuse(tokenList, options);
@@ -240,7 +281,7 @@ const TokenSelectionModal = (props: TokenSelectionModalProps) => {
   if (searchTerm === '') {
     allResults = tokenList.slice(0, 5);
   } else {
-    allResults = results.slice(0, 5).map((item) => item.item);
+    allResults = results.slice(0, 5).map(item => item.item);
   }
 
   return (
@@ -250,20 +291,20 @@ const TokenSelectionModal = (props: TokenSelectionModalProps) => {
         <ModalHeader>Select Token</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Flex direction="column">
+          <Flex direction='column'>
             <InputGroup>
-              <InputLeftElement pointerEvents="none" height="100%">
-                <SearchIcon color="gray.300" />
+              <InputLeftElement pointerEvents='none' height='100%'>
+                <SearchIcon color='gray.300' />
               </InputLeftElement>
               <Input
-                placeholder="Search by token name or address"
-                size="lg"
+                placeholder='Search by token name or address'
+                size='lg'
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </InputGroup>
           </Flex>
-          <Flex direction="column" paddingTop="1rem">
+          <Flex direction='column' paddingTop='1rem'>
             {results.length === 0 && isAddress(searchTerm) ? (
               <CustomTokenSelectionItem
                 tokenAddress={ethers.utils.getAddress(searchTerm)}
@@ -278,7 +319,7 @@ const TokenSelectionModal = (props: TokenSelectionModalProps) => {
                   <TokenSelectionItem
                     token={item}
                     key={i}
-                    onClick={(token) => {
+                    onClick={token => {
                       props.onSelect(token);
                       setSearchTerm('');
                     }}

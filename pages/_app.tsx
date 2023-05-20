@@ -7,6 +7,7 @@ import { arbitrum, goerli, mainnet, optimism, polygon } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react';
 import { provider, webSocketProvider } from '@/utils/networks';
+import { TokenListProvider } from '@/contexts/TokenContext';
 import { useMemo } from 'react';
 import { initialize } from '@/utils/railgun';
 import { useRailgunProvider } from '@/hooks/useRailgunProvider';
@@ -41,7 +42,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ChakraProvider>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
-          <Component {...pageProps} />
+          {isProviderLoaded && (
+            <TokenListProvider shieldingFees={shieldingFees}>
+              <Component {...pageProps} />
+            </TokenListProvider>
+          )}
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>

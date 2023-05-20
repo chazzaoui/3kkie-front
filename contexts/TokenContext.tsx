@@ -20,14 +20,14 @@ const initialContext = {
   isLoading: false,
   tokenList: [],
   tokenAllowances: new Map(),
-  shieldingFees: {},
+  shieldingFees: {}
 };
 
 const TokenContext = createContext<TokenContextType>(initialContext);
 
 export const TokenListProvider = ({
   children,
-  shieldingFees,
+  shieldingFees
 }: {
   children: ReactNode;
   shieldingFees: { [key: number]: BigNumber };
@@ -38,35 +38,36 @@ export const TokenListProvider = ({
   const {
     isLoading: balanceIsLoading,
     error: balanceError,
-    data,
+    data
   } = useTokenBalances({ tokenList: tokenList || [] });
   const {
     isLoading: allowanceIsLoading,
     error: allowanceError,
-    data: allowances,
+    data: allowances
   } = useTokenAllowances({ tokenList: tokenList || [] });
 
   if (balanceError && isConnected) {
     console.error(balanceError);
     notifyUser({
       alertType: 'error',
-      message: 'Something went wrong fetching the token balances',
+      message: 'Something went wrong fetching the token balances'
     });
   }
   if (allowanceError && isConnected) {
     console.error(allowanceError);
     notifyUser({
       alertType: 'error',
-      message: 'Something went wrong fetching the token allowances',
+      message: 'Something went wrong fetching the token allowances'
     });
   }
+  console.log({ data });
   return (
     <TokenContext.Provider
       value={{
         tokenList: data || [],
         isLoading: balanceIsLoading || allowanceIsLoading,
         tokenAllowances: allowances || new Map(),
-        shieldingFees,
+        shieldingFees
       }}
     >
       {children}

@@ -49,7 +49,6 @@ const ReviewTransactionModal = ({
 
   const bigNumberAmount = parseUnits(tokenAmount! || '0', tokenDecimals);
   const shieldFee = shieldingFees[chain?.id || 1] || shieldingFees[1] || 0;
-  console.log({ shieldFee });
   const feeAmount = parseUnits(tokenAmount || '0', tokenDecimals)
     .mul(shieldFee)
     .div(10000);
