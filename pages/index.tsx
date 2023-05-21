@@ -8,7 +8,8 @@ import { entropyToMnemonic, randomBytes } from 'ethers/lib/utils';
 import {
   createRailgunWallet,
   loadWalletByID,
-  balanceForERC20Token
+  getProver,
+  Groth16
 } from '@railgun-community/quickstart';
 
 const mnemonic = entropyToMnemonic(randomBytes(16));
@@ -39,9 +40,18 @@ import { MoneyInWallet } from '@/contexts/moneyInWallet';
 
 const Home: React.FC = () => {
   const { erc20Amounts } = useContext(MoneyInWallet);
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('');
   const { tokenList } = useToken();
+
+  useEffect(() => {
+    const groth16 = (global as unknown as { snarkjs: { groth16: Groth16 } })
+      .snarkjs?.groth16;
+    console.log({ groth16 });
+    const prover = getProver();
+    console.log(prover);
+    prover.setSnarkJSGroth16(groth16);
+  }, []);
 
   const [showQRCode, setShowQRCode] = useState(false);
   const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
@@ -95,7 +105,7 @@ const Home: React.FC = () => {
 
   const handleRequest = () => {
     setUrl(
-      `http://localhost:3000/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
+      `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
     );
     handleWalletCreation();
     setShowQRCode(!showQRCode);
@@ -198,71 +208,79 @@ const Home: React.FC = () => {
 
   return (
     <Container style={{ height: '100vh' }}>
-      <Flex as='header' position='fixed' backgroundColor='white' w='100%'>
+      <Flex
+        as='header'
+        position='fixed'
+        backgroundColor='white'
+        alignItems={'center'}
+        w='100%'
+      >
         <ConnectButton />
       </Flex>
-      <Center
-        paddingTop={20}
-        style={{ height: '100%', flexDirection: 'column' }}
-      >
-        <Heading as='h3' mb={16} size='xl' noOfLines={1}>
-          {`Your ZK wallet contains: ${ethers.utils.formatUnits(
-            erc20Amounts?.amountString || '0',
-            18
-          )}`}
-        </Heading>
-        <Heading as='h3' mb={16} size='xl' noOfLines={1}>
-          Private transfer
-        </Heading>
-        <Box
-          style={{
-            padding: '24px',
-            border: '1px solid black'
-          }}
+      {isConnected ? (
+        <Center
+          paddingTop={20}
+          style={{ height: '100%', flexDirection: 'column' }}
         >
-          <TokenInput
-            value={selectedToken}
-            onSelect={token => {
-              setSelectedToken(token);
+          <Heading as='h3' mb={16} size='xl' noOfLines={1}>
+            {`Your ZK wallet contains: ${ethers.utils.formatUnits(
+              erc20Amounts?.amountString || '0',
+              18
+            )}`}
+          </Heading>
+          <Heading as='h3' mb={16} size='xl' noOfLines={1}>
+            Private transfer
+          </Heading>
+          <Box
+            style={{
+              padding: '24px',
+              border: '1px solid black'
             }}
-            onBlur={async function (event: {
-              target: any;
-              type?: any;
-            }): Promise<boolean | void> {}}
-            onChange={async function (event: {
-              target: any;
-              type?: any;
-            }): Promise<boolean | void> {}}
-            name={''}
-          />
-          <NumberInput mb={12}>
-            <NumberInputField
-              placeholder='0.00'
-              value={amount}
-              onChange={handleAmountChange}
-            />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Center>
-            <Button
-              style={{
-                width: '100%',
-                background: 'black',
-                color: 'white',
-                fontSize: '24px',
-                height: '64px'
+          >
+            <TokenInput
+              value={selectedToken}
+              onSelect={token => {
+                setSelectedToken(token);
               }}
-              alignSelf={'center'}
-              onClick={handleRequest}
-            >
-              Request
-            </Button>
-          </Center>
-        </Box>
-      </Center>
+              onBlur={async function (event: {
+                target: any;
+                type?: any;
+              }): Promise<boolean | void> {}}
+              onChange={async function (event: {
+                target: any;
+                type?: any;
+              }): Promise<boolean | void> {}}
+              name={''}
+            />
+            <NumberInput mb={12}>
+              <NumberInputField
+                placeholder='0.00'
+                value={amount}
+                onChange={handleAmountChange}
+              />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+            <Center>
+              <Button
+                style={{
+                  width: '100%',
+                  background: 'black',
+                  color: 'white',
+                  fontSize: '24px',
+                  height: '64px'
+                }}
+                alignSelf={'center'}
+                onClick={handleRequest}
+              >
+                Request
+              </Button>
+            </Center>
+          </Box>
+        </Center>
+      ) : null}
     </Container>
   );
 };
