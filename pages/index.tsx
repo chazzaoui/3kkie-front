@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { CopyIcon } from '@chakra-ui/icons';
 import { RWebShare } from 'react-web-share';
@@ -7,7 +7,8 @@ import QRCode from 'react-qr-code';
 import { entropyToMnemonic, randomBytes } from 'ethers/lib/utils';
 import {
   createRailgunWallet,
-  loadWalletByID
+  loadWalletByID,
+  balanceForERC20Token
 } from '@railgun-community/quickstart';
 
 const mnemonic = entropyToMnemonic(randomBytes(16));
@@ -33,8 +34,13 @@ import { generateEncryptionKey } from '@/utils/generateKey';
 import { NetworkName } from '@railgun-community/shared-models';
 import TokenInput from '@/components/TokenInput';
 import { TokenListContextItem, useToken } from '@/contexts/TokenContext';
+import { ethers } from 'ethers';
+import { initialize } from '@/utils/railgun';
+import { MoneyInWallet } from '@/contexts/moneyInWallet';
 
 const Home: React.FC = () => {
+  const { erc20Amounts } = useContext(MoneyInWallet);
+  useMemo(initialize, []);
   const { address } = useAccount();
   const [amount, setAmount] = useState('');
   const { tokenList } = useToken();
@@ -66,7 +72,7 @@ const Home: React.FC = () => {
 
     loadRailgunWallet();
   }, []);
-  console.log({ selectedToken });
+
   const handleWalletCreation = async () => {
     const encryptionKey = generateEncryptionKey(address);
 
@@ -191,7 +197,7 @@ const Home: React.FC = () => {
       </Container>
     );
   }
-
+  console.log(erc20Amounts, 'heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
   return (
     <Container style={{ height: '100vh' }}>
       <Flex as='header' position='fixed' backgroundColor='white' w='100%'>
@@ -201,6 +207,12 @@ const Home: React.FC = () => {
         paddingTop={20}
         style={{ height: '100%', flexDirection: 'column' }}
       >
+        <Heading as='h3' mb={16} size='xl' noOfLines={1}>
+          {`Your wallet money is: ${ethers.utils.formatUnits(
+            erc20Amounts.amountString || '0',
+            18
+          )}`}
+        </Heading>
         <Heading as='h3' mb={16} size='xl' noOfLines={1}>
           Private transfer
         </Heading>

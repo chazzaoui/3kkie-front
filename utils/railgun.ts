@@ -9,7 +9,13 @@ import { BrowserLevel } from 'browser-level';
 import localforage from 'localforage';
 import { getNetwork, networks } from './networks';
 import { setOnBalanceUpdateCallback } from '@railgun-community/quickstart';
-import { Chain, NFTTokenType } from '@railgun-community/shared-models';
+import {
+  Chain,
+  NFTTokenType,
+  RailgunERC20Amount
+} from '@railgun-community/shared-models';
+import { useContext } from 'react';
+import { MoneyInWallet } from '@/contexts/moneyInWallet';
 
 export const loadProviders = async () => {
   // Whether to forward debug logs from Fallback Provider.
@@ -51,6 +57,7 @@ const artifactStore = new ArtifactStore(
 );
 
 export const initialize = () => {
+  const { setERC20Amounts } = useContext(MoneyInWallet);
   // Name for your wallet implementation.
   // Encrypted and viewable in private transaction history.
   // Maximum of 16 characters, lowercase.
@@ -86,7 +93,7 @@ export const initialize = () => {
     nftAmounts
   }): void => {
     console.log(erc20Amounts);
-    console.log(nftAmounts);
+    if (erc20Amounts?.length > 0) setERC20Amounts?.(erc20Amounts?.[0]);
   };
 
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);

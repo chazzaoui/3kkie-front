@@ -11,6 +11,7 @@ import { TokenListProvider } from '@/contexts/TokenContext';
 import { useMemo } from 'react';
 import { initialize } from '@/utils/railgun';
 import { useRailgunProvider } from '@/hooks/useRailgunProvider';
+import { MoneyInWalletProvider } from '@/contexts/moneyInWallet';
 
 const { chains } = configureChains(
   [
@@ -36,7 +37,6 @@ const wagmiClient = createClient({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
-  useMemo(initialize, []);
   const { isProviderLoaded, shieldingFees } = useRailgunProvider();
   return (
     <ChakraProvider>
@@ -44,7 +44,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <RainbowKitProvider chains={chains}>
           {isProviderLoaded ? (
             <TokenListProvider shieldingFees={shieldingFees}>
-              <Component {...pageProps} />
+              <MoneyInWalletProvider>
+                <Component {...pageProps} />
+              </MoneyInWalletProvider>
             </TokenListProvider>
           ) : null}
         </RainbowKitProvider>
