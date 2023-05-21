@@ -85,15 +85,4 @@ export const initialize = () => {
     skipMerkleTreeScans
   );
   setLogging();
-
-  const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
-    chain,
-    railgunWalletID,
-    erc20Amounts,
-    nftAmounts
-  }): void => {
-    if (erc20Amounts?.length > 0) setERC20Amounts?.(erc20Amounts?.[0]);
-  };
-
-  setOnBalanceUpdateCallback(onBalanceUpdateCallback);
 };

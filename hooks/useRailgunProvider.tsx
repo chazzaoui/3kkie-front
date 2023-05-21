@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { setProviderForNetwork } from '@railgun-community/quickstart';
 import { BigNumber } from 'ethers';
 import { useNetwork, useProvider } from 'wagmi';
 import { getNetwork, networks } from '@/utils/networks';
-import { loadProviders } from '@/utils/railgun';
+import { initialize, loadProviders } from '@/utils/railgun';
 
 // Fee is in bips, e.g. a value of 25 is a 0.25% fee.
 interface ShieldFee {
@@ -11,14 +11,16 @@ interface ShieldFee {
 }
 
 const fallbackShieldingFees: ShieldFee = {};
-Object.keys(networks).forEach((chainId) => {
+Object.keys(networks).forEach(chainId => {
   // Current fees are 0.25% everywhere, so we initialize with that
   fallbackShieldingFees[Number(chainId)] = BigNumber.from('25');
 });
 
 export const useRailgunProvider = () => {
   const [isProviderLoaded, setProviderLoaded] = useState<Boolean>(false);
-  const [shieldingFees, setShieldingFees] = useState<ShieldFee>(fallbackShieldingFees);
+  const [shieldingFees, setShieldingFees] = useState<ShieldFee>(
+    fallbackShieldingFees
+  );
   const { chain } = useNetwork();
   const network = getNetwork(chain?.id);
   const provider = useProvider();
@@ -33,7 +35,9 @@ export const useRailgunProvider = () => {
         const newFee = response.providerInfo.feesSerialized?.shield;
         return {
           ...acc,
-          [response.chainId]: BigNumber.from(newFee || fallbackShieldingFees[response.chainId]),
+          [response.chainId]: BigNumber.from(
+            newFee || fallbackShieldingFees[response.chainId]
+          )
         };
       }, {});
       setShieldingFees(shieldingFeesFromNetwork);

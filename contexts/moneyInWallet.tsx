@@ -1,6 +1,11 @@
 // Create a new context
+import { initialize } from '@/utils/railgun';
 import { RailgunERC20Amount } from '@railgun-community/shared-models';
-import { useContext, createContext, useState } from 'react';
+import { useContext, createContext, useState, useMemo, useEffect } from 'react';
+import {
+  BalancesUpdatedCallback,
+  setOnBalanceUpdateCallback
+} from '@railgun-community/quickstart';
 
 interface MyMoneysContextType {
   erc20Amounts?: RailgunERC20Amount;
@@ -26,7 +31,21 @@ export const MoneyInWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     RailgunERC20Amount | undefined
   >();
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  useEffect(() => {
+    function walletmoney() {
+      const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
+        chain,
+        railgunWalletID,
+        erc20Amounts,
+        nftAmounts
+      }): void => {
+        if (erc20Amounts?.length > 0) setERC20Amounts?.(erc20Amounts?.[0]);
+      };
 
+      setOnBalanceUpdateCallback(onBalanceUpdateCallback);
+    }
+    walletmoney();
+  }, []);
   return (
     <MoneyInWallet.Provider
       value={{

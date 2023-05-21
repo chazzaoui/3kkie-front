@@ -35,7 +35,6 @@ import { NetworkName } from '@railgun-community/shared-models';
 import TokenInput from '@/components/TokenInput';
 import { TokenListContextItem, useToken } from '@/contexts/TokenContext';
 import { ethers } from 'ethers';
-import { initialize } from '@/utils/railgun';
 import { MoneyInWallet } from '@/contexts/moneyInWallet';
 
 const Home: React.FC = () => {
