@@ -1,7 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@chakra-ui/button';
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react';
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading
+} from '@chakra-ui/react';
 import { CopyIcon } from '@chakra-ui/icons';
 import { Input, InputGroup } from '@chakra-ui/input';
 import { Box, Flex, Text } from '@chakra-ui/layout';
@@ -34,6 +39,9 @@ import {
 import { buildBaseToken, getNetwork } from '@/utils/networks';
 import { endsWithAny } from '@/utils/string';
 import { isAmountParsable } from '@/utils/token';
+import { useRouter } from 'next/router';
+import { MoneyInWallet } from '@/contexts/moneyInWallet';
+import { motion } from 'framer-motion';
 
 type TxFormValues = {
   recipient: string;
@@ -81,6 +89,7 @@ export const TxForm = ({
 
   const [selectedToken, setSelectedToken] =
     useState<TokenListContextItem>(tokenWithChainId);
+  const { paymentSuccess } = useContext(MoneyInWallet);
 
   const [validAddress, setValidAddress] = useState(false);
   // const { config } = usePrepareContractWrite({
@@ -143,6 +152,29 @@ export const TxForm = ({
     return unwatch;
   }, [updateOnNetworkChange]);
 
+  if (paymentSuccess)
+    return (
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        height='100vh'
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Heading as='h3' mb={8} size='xl' noOfLines={1}>
+            Payment successful!
+          </Heading>
+          <img
+            src={'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif'}
+          />
+        </motion.div>
+      </Box>
+    );
+
   return (
     <Box maxWidth='24rem' className='container'>
       <form onSubmit={onSubmit}>
@@ -169,6 +201,7 @@ export const TxForm = ({
             resize='none'
             mb='.25rem'
             height='9rem'
+            disabled
             placeholder='0zk1qyn0qa5rgk7z2l8wyncpynmydgj7ucrrcczhl8k27q2rw5ldvv2qrrv7j6fe3z53ll5j4fjs9j5cmq7mxsaulah7ykk6jwqna3nwvxudp5w6fwyg8cgwkwwv3g4'
             {...register('recipient', {
               required: 'This is required',
@@ -210,8 +243,9 @@ export const TxForm = ({
             pr='4.5rem'
             height='100%'
             padding={4}
-            placeholder={selectedToken?.name}
+            placeholder={selectedToken?.symbol}
             disabled={true}
+            value={selectedToken?.symbol}
           />
         </FormControl>
         <FormControl isInvalid={Boolean(errors.amount?.message)}>

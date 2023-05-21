@@ -40,7 +40,6 @@ import { MoneyInWallet } from '@/contexts/moneyInWallet';
 
 const Home: React.FC = () => {
   const { erc20Amounts } = useContext(MoneyInWallet);
-  useMemo(initialize, []);
   const { address } = useAccount();
   const [amount, setAmount] = useState('');
   const { tokenList } = useToken();
@@ -197,7 +196,7 @@ const Home: React.FC = () => {
       </Container>
     );
   }
-  console.log(erc20Amounts, 'heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
+
   return (
     <Container style={{ height: '100vh' }}>
       <Flex as='header' position='fixed' backgroundColor='white' w='100%'>
@@ -209,7 +208,7 @@ const Home: React.FC = () => {
       >
         <Heading as='h3' mb={16} size='xl' noOfLines={1}>
           {`Your wallet money is: ${ethers.utils.formatUnits(
-            erc20Amounts.amountString || '0',
+            erc20Amounts?.amountString || '0',
             18
           )}`}
         </Heading>

@@ -92,7 +92,6 @@ export const initialize = () => {
     erc20Amounts,
     nftAmounts
   }): void => {
-    console.log(erc20Amounts);
     if (erc20Amounts?.length > 0) setERC20Amounts?.(erc20Amounts?.[0]);
   };
 

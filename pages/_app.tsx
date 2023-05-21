@@ -38,16 +38,18 @@ const wagmiClient = createClient({
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { isProviderLoaded, shieldingFees } = useRailgunProvider();
+  useMemo(initialize, []);
+
   return (
     <ChakraProvider>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
           {isProviderLoaded ? (
-            <TokenListProvider shieldingFees={shieldingFees}>
-              <MoneyInWalletProvider>
+            <MoneyInWalletProvider>
+              <TokenListProvider shieldingFees={shieldingFees}>
                 <Component {...pageProps} />
-              </MoneyInWalletProvider>
-            </TokenListProvider>
+              </TokenListProvider>
+            </MoneyInWalletProvider>
           ) : null}
         </RainbowKitProvider>
       </WagmiConfig>

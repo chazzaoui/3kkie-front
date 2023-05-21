@@ -3,6 +3,8 @@ import { AlertStatus } from '@chakra-ui/react';
 import { ToastPosition, useToast } from '@chakra-ui/toast';
 import { useProvider } from 'wagmi';
 import { getEtherscanUrl } from '@/utils/networks';
+import { MoneyInWallet } from '@/contexts/moneyInWallet';
+import { useContext } from 'react';
 
 const toastDefaultArgs = {
   position: 'bottom-right' as ToastPosition,
@@ -38,6 +40,7 @@ const useNotifications = () => {
 
   // TODO: Based on the umbra implementation of BNC and untested
   const txNotify = async (txHash: string) => {
+    const { setPaymentSuccess } = useContext(MoneyInWallet);
     const { chainId } = await provider.getNetwork();
     const href = getEtherscanUrl(txHash, chainId);
     const toastId = toast({
@@ -54,6 +57,7 @@ const useNotifications = () => {
     });
 
     const { status } = await provider.waitForTransaction(txHash);
+    if (status) setPaymentSuccess(true);
     toast.update(toastId, {
       ...toastDefaultArgs,
       description: status ? (
