@@ -83,12 +83,9 @@ export const TxForm = ({
     onClose: closeReview
   } = useDisclosure();
 
-  const tokenWithChainId = tokenList.find(
-    toke => toke.symbol === token
-  ) as TokenListContextItem;
-
-  const [selectedToken, setSelectedToken] =
-    useState<TokenListContextItem>(tokenWithChainId);
+  const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
+    tokenList[0]
+  );
   const { paymentSuccess } = useContext(MoneyInWallet);
 
   const [validAddress, setValidAddress] = useState(false);
@@ -103,7 +100,15 @@ export const TxForm = ({
   //   ]
   // });
   // const { writeAsync: doErc20Approval } = useContractWrite(config);
+  useEffect(() => {
+    const tokenWithChainId = tokenList.find(
+      toke => toke.symbol === token
+    ) as TokenListContextItem;
+    setSelectedToken(tokenWithChainId);
+  }, [token]);
+
   const [isApprovalLoading, setIsApprovalLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { data } = useTokenAllowance({ address: selectedToken?.address || '' });
   const tokenAllowance =
     tokenAllowances.get(selectedToken?.address || '') ||
@@ -115,11 +120,20 @@ export const TxForm = ({
   );
   const { data: resolvedUnstoppableDomain, trigger: resolveDomain } =
     useResolveUnstoppableDomainAddress();
+  console.log(
+    selectedToken?.address,
+    ethAddress,
+    ethers.utils
+      .parseUnits(amount || '0', selectedToken?.decimals)
+      .gt(tokenAllowance)
+  );
+  console.log({ selectedToken });
   const needsApproval =
     selectedToken?.address !== ethAddress &&
     ethers.utils
       .parseUnits(amount || '0', selectedToken?.decimals)
       .gt(tokenAllowance);
+
   const onCopy = () => {
     navigator.clipboard.writeText(
       `${window.location.host}/send?address=${recipientDisplayName}`
@@ -259,29 +273,29 @@ export const TxForm = ({
               placeholder='0.1'
               disabled={true}
               value={amount}
-              {...register('amount', {
-                required: 'This is required',
-                validate: value => {
-                  try {
-                    if (
-                      !VALID_AMOUNT_REGEX.test(value) &&
-                      isNaN(parseFloat(value))
-                    ) {
-                      return 'Not a valid number';
-                    }
+              // {...register('amount', {
+              //   required: 'This is required',
+              //   validate: value => {
+              //     try {
+              //       if (
+              //         !VALID_AMOUNT_REGEX.test(value) &&
+              //         isNaN(parseFloat(value))
+              //       ) {
+              //         return 'Not a valid number';
+              //       }
 
-                    return (
-                      Boolean(
-                        ethers.utils
-                          .parseUnits(value || '0', selectedToken?.decimals)
-                          .gt(BigNumber.from('0'))
-                      ) || 'Amount must be greater than 0'
-                    );
-                  } catch (e) {
-                    return 'Not a valid number';
-                  }
-                }
-              })}
+              //       return (
+              //         Boolean(
+              //           ethers.utils
+              //             .parseUnits(value || '0', selectedToken?.decimals)
+              //             .gt(BigNumber.from('0'))
+              //         ) || 'Amount must be greater than 0'
+              //       );
+              //     } catch (e) {
+              //       return 'Not a valid number';
+              //     }
+              //   }
+              // })}
             />
           </InputGroup>
           <FormErrorMessage my='.25rem'>

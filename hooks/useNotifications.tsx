@@ -57,7 +57,6 @@ const useNotifications = () => {
     });
 
     const { status } = await provider.waitForTransaction(txHash);
-    if (status) setPaymentSuccess(true);
     toast.update(toastId, {
       ...toastDefaultArgs,
       description: status ? (
@@ -71,6 +70,7 @@ const useNotifications = () => {
       ),
       status: status ? 'success' : 'error'
     });
+    if (status) setPaymentSuccess(true);
   };
 
   return {
