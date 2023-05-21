@@ -206,7 +206,7 @@ const Home: React.FC = () => {
         style={{ height: '100%', flexDirection: 'column' }}
       >
         <Heading as='h3' mb={16} size='xl' noOfLines={1}>
-          {`Your wallet money is: ${ethers.utils.formatUnits(
+          {`Your ZK wallet contains: ${ethers.utils.formatUnits(
             erc20Amounts?.amountString || '0',
             18
           )}`}

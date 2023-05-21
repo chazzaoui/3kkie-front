@@ -31,6 +31,7 @@ export const MoneyInWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     RailgunERC20Amount | undefined
   >();
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+
   useEffect(() => {
     function walletmoney() {
       const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
@@ -46,6 +47,7 @@ export const MoneyInWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     walletmoney();
   }, []);
+
   return (
     <MoneyInWallet.Provider
       value={{
