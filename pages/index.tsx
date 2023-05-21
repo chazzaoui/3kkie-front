@@ -44,13 +44,6 @@ const Home: React.FC = () => {
   const [amount, setAmount] = useState('');
   const { tokenList } = useToken();
 
-  useEffect(() => {
-    const groth16 = (global as unknown as { snarkjs: { groth16: Groth16 } })
-      .snarkjs?.groth16;
-    const prover = getProver();
-    prover.setSnarkJSGroth16(groth16);
-  }, []);
-
   const [showQRCode, setShowQRCode] = useState(false);
   const [selectedToken, setSelectedToken] = useState<TokenListContextItem>(
     tokenList[0]
