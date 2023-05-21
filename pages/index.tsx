@@ -37,6 +37,7 @@ import TokenInput from '@/components/TokenInput';
 import { TokenListContextItem, useToken } from '@/contexts/TokenContext';
 import { ethers } from 'ethers';
 import { MoneyInWallet } from '@/contexts/moneyInWallet';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 const Home: React.FC = () => {
   const { erc20Amounts } = useContext(MoneyInWallet);
@@ -49,16 +50,17 @@ const Home: React.FC = () => {
     tokenList[0]
   );
   const [url, setUrl] = useState('');
+  const [railgunId, setRailgunId] = useLocalStorage<string>('railGunId', '');
 
   const [railgunWallet, setRailgunWallet] = useState<string | undefined>('');
   const toast = useToast();
-  const railgunId = localStorage.getItem('railgunId');
+
   const { hasCopied, onCopy } = useClipboard(url);
 
   useEffect(() => {
     const loadRailgunWallet = async () => {
       const encryptionKey = generateEncryptionKey(address);
-      if (railgunId && railgunId !== 'null') {
+      if (railgunId) {
         const railgunWallet = await loadWalletByID(
           encryptionKey,
           railgunId,
@@ -92,7 +94,7 @@ const Home: React.FC = () => {
       setUrl(
         `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet.railgunWalletInfo?.railgunAddress}&amount=${amount}&token=${selectedToken?.symbol}`
       );
-      localStorage.setItem('railgunId', railgunId as string);
+      setRailgunId(railgunId);
       setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
     }
   };
