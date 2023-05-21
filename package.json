@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@railgun-community/quickstart": "^4.4.3",
     "@railgun-community/shared-models": "^4.2.2",
+    "@railgun-community/waku-relayer-client": "^2.4.0",
     "@rainbow-me/rainbowkit": "^0.8.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/level-js": "^4.0.2",
