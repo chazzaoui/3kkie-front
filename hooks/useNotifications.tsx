@@ -40,7 +40,6 @@ const useNotifications = () => {
 
   // TODO: Based on the umbra implementation of BNC and untested
   const txNotify = async (txHash: string) => {
-    const { setPaymentSuccess } = useContext(MoneyInWallet);
     const { chainId } = await provider.getNetwork();
     const href = getEtherscanUrl(txHash, chainId);
     const toastId = toast({
@@ -70,7 +69,6 @@ const useNotifications = () => {
       ),
       status: status ? 'success' : 'error'
     });
-    if (status) setPaymentSuccess(true);
   };
 
   return {
