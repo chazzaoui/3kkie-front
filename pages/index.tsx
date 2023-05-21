@@ -47,9 +47,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const groth16 = (global as unknown as { snarkjs: { groth16: Groth16 } })
       .snarkjs?.groth16;
-    console.log({ groth16 });
     const prover = getProver();
-    console.log(prover);
     prover.setSnarkJSGroth16(groth16);
   }, []);
 
@@ -67,16 +65,13 @@ const Home: React.FC = () => {
   useEffect(() => {
     const loadRailgunWallet = async () => {
       const encryptionKey = generateEncryptionKey(address);
-
-      if (railgunId) {
+      if (railgunId && railgunId !== 'null') {
         const railgunWallet = await loadWalletByID(
           encryptionKey,
           railgunId,
           false
         );
-        setUrl(
-          `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet.railgunWalletInfo?.railgunAddress}&amount=${amount}&token=${selectedToken?.symbol}`
-        );
+
         setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
       }
     };
@@ -91,12 +86,14 @@ const Home: React.FC = () => {
       [NetworkName.Ethereum]: 15725700,
       [NetworkName.Polygon]: 3421400
     };
-    if (!railgunId) {
+
+    if (!railgunId || railgunId === 'null') {
       const railgunWallet = await createRailgunWallet(
         encryptionKey,
         mnemonic,
         creationBlockNumberMap
       );
+      console.log({ railgunWallet }, 'inside');
       setUrl(
         `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet.railgunWalletInfo?.railgunAddress}&amount=${amount}&token=${selectedToken?.symbol}`
       );
@@ -105,13 +102,25 @@ const Home: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const updateUrl = () => {
+      setUrl(
+        `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
+      );
+    };
+
+    updateUrl();
+  }, [railgunWallet, amount, selectedToken]);
+
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
   };
 
   const handleRequest = async () => {
-    await handleWalletCreation();
-
+    handleWalletCreation();
+    setUrl(
+      `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
+    );
     setShowQRCode(!showQRCode);
   };
 
@@ -124,7 +133,7 @@ const Home: React.FC = () => {
       isClosable: true
     });
   };
-
+  console.log({ url });
   if (showQRCode) {
     return (
       <>
