@@ -94,6 +94,9 @@ const Home: React.FC = () => {
         mnemonic,
         creationBlockNumberMap
       );
+      setUrl(
+        `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet.railgunWalletInfo?.railgunAddress}&amount=${amount}&token=${selectedToken?.symbol}`
+      );
       localStorage.setItem('railgunId', railgunId as string);
       setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
     }
@@ -105,9 +108,7 @@ const Home: React.FC = () => {
 
   const handleRequest = async () => {
     await handleWalletCreation();
-    setUrl(
-      `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
-    );
+
     setShowQRCode(!showQRCode);
   };
 
