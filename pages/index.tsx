@@ -74,6 +74,9 @@ const Home: React.FC = () => {
           railgunId,
           false
         );
+        setUrl(
+          `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet.railgunWalletInfo?.railgunAddress}&amount=${amount}&token=${selectedToken?.symbol}`
+        );
         setRailgunWallet(railgunWallet.railgunWalletInfo?.railgunAddress);
       }
     };
