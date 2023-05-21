@@ -243,9 +243,9 @@ export const TxForm = ({
             pr='4.5rem'
             height='100%'
             padding={4}
-            placeholder={selectedToken?.symbol}
+            placeholder={token}
             disabled={true}
-            value={selectedToken?.symbol}
+            value={token}
           />
         </FormControl>
         <FormControl isInvalid={Boolean(errors.amount?.message)}>

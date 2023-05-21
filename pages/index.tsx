@@ -103,11 +103,11 @@ const Home: React.FC = () => {
     setAmount(event.target.value);
   };
 
-  const handleRequest = () => {
+  const handleRequest = async () => {
+    await handleWalletCreation();
     setUrl(
       `https://3kkie-front.vercel.app/pay?receiver=${railgunWallet}&amount=${amount}&token=${selectedToken?.symbol}`
     );
-    handleWalletCreation();
     setShowQRCode(!showQRCode);
   };
 
@@ -123,165 +123,197 @@ const Home: React.FC = () => {
 
   if (showQRCode) {
     return (
-      <Container style={{ height: '100%' }}>
-        <Flex as='header' position='fixed' backgroundColor='white' w='100%'>
+      <>
+        <Flex
+          as='header'
+          position='fixed'
+          backgroundColor='white'
+          display={'flex'}
+          justifyContent={'center'}
+          alignItems={'center'}
+          width={'100vw'}
+        >
           <ConnectButton />
         </Flex>
-        <Center
-          paddingTop={20}
-          style={{ height: '100%', flexDirection: 'column' }}
-        >
-          <Heading as='h3' mb={4} size='xl' noOfLines={1}>
-            Share this link or show QR code
-          </Heading>
-          <Text fontSize='lg' mb={8}>
-            We recommend sending it using VPN and from a burner phone number or
-            anonymous account
-          </Text>
-          <Box p={4} style={{ width: '80%' }}>
-            <Flex direction='column' alignItems='center' mb={8}>
-              <QRCode
-                size={256}
-                style={{ height: 'auto', maxWidth: '100%' }}
-                value={url}
-                viewBox={`0 0 256 256`}
-              />
-            </Flex>
-            <Flex alignItems='center' mb={4}>
-              <Text
-                overflow='hidden'
-                textOverflow='ellipsis'
-                whiteSpace='nowrap'
+        <Container style={{ height: '100%' }}>
+          <Center
+            paddingTop={20}
+            style={{ height: '100%', flexDirection: 'column' }}
+          >
+            <Heading as='h3' mb={4} size='xl' noOfLines={1}>
+              Share this link or show QR code
+            </Heading>
+            <Text fontSize='lg' mb={8}>
+              We recommend sending it using VPN and from a burner phone number
+              or anonymous account
+            </Text>
+            <Box p={4} style={{ width: '80%' }}>
+              <Flex direction='column' alignItems='center' mb={8}>
+                <QRCode
+                  size={256}
+                  style={{ height: 'auto', maxWidth: '100%' }}
+                  value={url}
+                  viewBox={`0 0 256 256`}
+                />
+              </Flex>
+              <Flex alignItems='center' mb={4}>
+                <Text
+                  overflow='hidden'
+                  textOverflow='ellipsis'
+                  whiteSpace='nowrap'
+                >
+                  {url}
+                </Text>
+                <IconButton
+                  aria-label='Copy URL'
+                  variant='ghost'
+                  colorScheme='gray'
+                  icon={<CopyIcon />}
+                  onClick={handleCopy}
+                  ml={2}
+                />
+              </Flex>
+              <Center flexDirection={'column'}>
+                <RWebShare
+                  data={{
+                    text: 'You got a 3ikkie!',
+                    url: url,
+                    title: 'Payment request'
+                  }}
+                  onClick={() => console.log('shared successfully!')}
+                >
+                  <Button
+                    style={{
+                      width: '100%',
+                      background: 'black',
+                      color: 'white',
+                      fontSize: '24px',
+                      height: '64px',
+                      marginBottom: 8
+                    }}
+                  >
+                    Share on Social
+                  </Button>
+                </RWebShare>
+                <Button
+                  style={{
+                    width: '100%',
+                    color: 'black',
+                    fontSize: '24px',
+                    height: '64px',
+                    border: '1px solid black'
+                  }}
+                  mb={4}
+                  onClick={handleRequest}
+                >
+                  Create New Request
+                </Button>
+              </Center>
+            </Box>
+          </Center>
+        </Container>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Flex
+        as='header'
+        position='fixed'
+        backgroundColor='white'
+        display={'flex'}
+        justifyContent={'center'}
+        alignItems={'center'}
+        width={'100vw'}
+      >
+        <ConnectButton />
+      </Flex>
+      <Container style={{ height: '100vh', width: '100vw' }}>
+        {isConnected ? (
+          <Center
+            paddingTop={20}
+            style={{ height: '100%', flexDirection: 'column' }}
+          >
+            <Heading as='h3' mb={8} size='xl' noOfLines={1}>
+              {`Your ZK wallet contains: ${ethers.utils.formatUnits(
+                erc20Amounts?.amountString || '0',
+                18
+              )}`}
+            </Heading>
+            {Number(
+              ethers.utils.formatUnits(erc20Amounts?.amountString || '0', 18)
+            ) > 0 ? (
+              <Button
+                mb={16}
+                onClick={() =>
+                  // handleUnshield(
+                  //   railgunWallet as string,
+                  //   erc20Amounts?.amountString as string,
+                  //   erc20Amounts?.tokenAddress as string,
+                  //   address as `0x${string}`
+                  // )
+                  console.log('unshielded!')
+                }
               >
-                {url}
-              </Text>
-              <IconButton
-                aria-label='Copy URL'
-                variant='ghost'
-                colorScheme='gray'
-                icon={<CopyIcon />}
-                onClick={handleCopy}
-                ml={2}
-              />
-            </Flex>
-            <Center flexDirection={'column'}>
-              <RWebShare
-                data={{
-                  text: 'You got a 3ikkie!',
-                  url: url,
-                  title: 'Payment request'
+                Unshield me baby
+              </Button>
+            ) : null}
+            <Heading as='h3' mb={16} size='xl' noOfLines={1}>
+              Private transfer
+            </Heading>
+            <Box
+              style={{
+                padding: '24px',
+                border: '1px solid black'
+              }}
+            >
+              <TokenInput
+                value={selectedToken}
+                onSelect={token => {
+                  setSelectedToken(token);
                 }}
-                onClick={() => console.log('shared successfully!')}
-              >
+                onBlur={async function (event: {
+                  target: any;
+                  type?: any;
+                }): Promise<boolean | void> {}}
+                onChange={async function (event: {
+                  target: any;
+                  type?: any;
+                }): Promise<boolean | void> {}}
+                name={''}
+              />
+              <NumberInput mb={12}>
+                <NumberInputField
+                  placeholder='0.00'
+                  value={amount}
+                  onChange={handleAmountChange}
+                />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Center>
                 <Button
                   style={{
                     width: '100%',
                     background: 'black',
                     color: 'white',
                     fontSize: '24px',
-                    height: '64px',
-                    marginBottom: 8
+                    height: '64px'
                   }}
+                  alignSelf={'center'}
+                  onClick={handleRequest}
                 >
-                  Share on Social
+                  Request
                 </Button>
-              </RWebShare>
-              <Button
-                style={{
-                  width: '100%',
-                  color: 'black',
-                  fontSize: '24px',
-                  height: '64px',
-                  border: '1px solid black'
-                }}
-                mb={4}
-                onClick={handleRequest}
-              >
-                Create New Request
-              </Button>
-            </Center>
-          </Box>
-        </Center>
+              </Center>
+            </Box>
+          </Center>
+        ) : null}
       </Container>
-    );
-  }
-
-  return (
-    <Container style={{ height: '100vh' }}>
-      <Flex
-        as='header'
-        position='fixed'
-        backgroundColor='white'
-        alignItems={'center'}
-        w='100%'
-      >
-        <ConnectButton />
-      </Flex>
-      {isConnected ? (
-        <Center
-          paddingTop={20}
-          style={{ height: '100%', flexDirection: 'column' }}
-        >
-          <Heading as='h3' mb={16} size='xl' noOfLines={1}>
-            {`Your ZK wallet contains: ${ethers.utils.formatUnits(
-              erc20Amounts?.amountString || '0',
-              18
-            )}`}
-          </Heading>
-          <Heading as='h3' mb={16} size='xl' noOfLines={1}>
-            Private transfer
-          </Heading>
-          <Box
-            style={{
-              padding: '24px',
-              border: '1px solid black'
-            }}
-          >
-            <TokenInput
-              value={selectedToken}
-              onSelect={token => {
-                setSelectedToken(token);
-              }}
-              onBlur={async function (event: {
-                target: any;
-                type?: any;
-              }): Promise<boolean | void> {}}
-              onChange={async function (event: {
-                target: any;
-                type?: any;
-              }): Promise<boolean | void> {}}
-              name={''}
-            />
-            <NumberInput mb={12}>
-              <NumberInputField
-                placeholder='0.00'
-                value={amount}
-                onChange={handleAmountChange}
-              />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Center>
-              <Button
-                style={{
-                  width: '100%',
-                  background: 'black',
-                  color: 'white',
-                  fontSize: '24px',
-                  height: '64px'
-                }}
-                alignSelf={'center'}
-                onClick={handleRequest}
-              >
-                Request
-              </Button>
-            </Center>
-          </Box>
-        </Center>
-      ) : null}
-    </Container>
+    </>
   );
 };
 
